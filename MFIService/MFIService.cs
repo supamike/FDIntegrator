@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace MFIService
 {
-    public partial class Service1 : ServiceBase
+    public partial class MFIService : ServiceBase
     {
-        public Service1()
+        public MFIService()
         {
             InitializeComponent();
         }
