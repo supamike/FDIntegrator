@@ -28,10 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
+            this.MFIServiceEventLog = new System.Diagnostics.EventLog();
+            ((System.ComponentModel.ISupportInitialize)(this.MFIServiceEventLog)).BeginInit();
+            // 
+            // MFIService
+            // 
             this.ServiceName = "MFIService";
+            ((System.ComponentModel.ISupportInitialize)(this.MFIServiceEventLog)).EndInit();
+
         }
 
         #endregion
+
+        private System.Diagnostics.EventLog MFIServiceEventLog;
     }
 }
