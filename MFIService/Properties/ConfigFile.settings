@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="local_host" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">localhost</Value>
+      <Value Profile="(Default)">PSSPKAMLP110\SQLEXPRESS</Value>
     </Setting>
     <Setting Name="local_database" Type="System.String" Scope="Application">
       <Value Profile="(Default)">MFI_INTERFACE</Value>
@@ -15,7 +15,7 @@
       <Value Profile="(Default)">sa</Value>
     </Setting>
     <Setting Name="local_password" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">Palladium2020</Value>
+      <Value Profile="(Default)">MOUlin123</Value>
     </Setting>
     <Setting Name="remote_host" Type="System.String" Scope="Application">
       <Value Profile="(Default)">MEDACCKAMTEST01</Value>
@@ -37,6 +37,12 @@
     </Setting>
     <Setting Name="local_database_technology" Type="System.String" Scope="Application">
       <Value Profile="(Default)">MSSQL</Value>
+    </Setting>
+    <Setting Name="sync_interval" Type="System.Int64" Scope="Application">
+      <Value Profile="(Default)">30000</Value>
+    </Setting>
+    <Setting Name="log_path" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:\\MFI_Service_Log.txt</Value>
     </Setting>
   </Settings>
 </SettingsFile>

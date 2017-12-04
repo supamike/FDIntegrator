@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,11 +21,21 @@ namespace MFIService.config
         private static String REMOTE_PORT = "";
         private static String REMOTE_USER = "";
         private static String REMOTE_PASSWORD = "";
-        private static String PASSWORDS_ARE_ENCRYPTED="";
-        private static String LOCAL_DATABASE_TECHNOLOGY="";
+        private static String PASSWORDS_ARE_ENCRYPTED = "";
+        private static String LOCAL_DATABASE_TECHNOLOGY = "";
+        public static long SYNC_INTERVAL = 3600000;//60000=1 min
+        public static String LOG_PATH = "C:\\MFI_Service_Log.txt";
 
         public static void readConfigFile()
         {
+            if (Properties.ConfigFile.Default.sync_interval > 0)
+            {
+                DatabaseConnection.SYNC_INTERVAL = Properties.ConfigFile.Default.sync_interval;
+            }
+            if (Properties.ConfigFile.Default.log_path.Length > 0)
+            {
+                DatabaseConnection.LOG_PATH = Properties.ConfigFile.Default.log_path;
+            }
             DatabaseConnection.LOCAL_DATABASE_TECHNOLOGY = Properties.ConfigFile.Default.local_database_technology;
             DatabaseConnection.PASSWORDS_ARE_ENCRYPTED = Properties.ConfigFile.Default.passwords_are_encrypted;
             DatabaseConnection.LOCAL_HOST = Properties.ConfigFile.Default.local_host;
@@ -60,8 +72,14 @@ namespace MFIService.config
                 //MS SQL
                 if (DatabaseConnection.LOCAL_DATABASE_TECHNOLOGY.Equals("MSSQL"))
                 {
-                    LocalConnectionString = @"Data Source=" + DatabaseConnection.LOCAL_HOST + "," + DatabaseConnection.LOCAL_PORT + ";Initial Catalog=" + DatabaseConnection.LOCAL_DATABASE + ";User ID=" + DatabaseConnection.LOCAL_USER + ";Password=" + DatabaseConnection.LOCAL_PASSWORD + "";
-                    //LocalConnectionString = "Data Source=" + DatabaseConnection.LOCAL_HOST + "," + DatabaseConnection.LOCAL_PORT + ";Initial Catalog=" + DatabaseConnection.LOCAL_DATABASE + ";User ID=" + DatabaseConnection.LOCAL_USER + ";Password=" + DatabaseConnection.LOCAL_PASSWORD + "";
+                    if (DatabaseConnection.LOCAL_PORT.Length > 0)
+                    {
+                        LocalConnectionString = @"Data Source=" + DatabaseConnection.LOCAL_HOST + "," + DatabaseConnection.LOCAL_PORT + ";Initial Catalog=" + DatabaseConnection.LOCAL_DATABASE + ";User ID=" + DatabaseConnection.LOCAL_USER + ";Password=" + DatabaseConnection.LOCAL_PASSWORD + "";
+                    }
+                    else
+                    {
+                        LocalConnectionString = @"Data Source=" + DatabaseConnection.LOCAL_HOST + ";Initial Catalog=" + DatabaseConnection.LOCAL_DATABASE + ";User ID=" + DatabaseConnection.LOCAL_USER + ";Password=" + DatabaseConnection.LOCAL_PASSWORD + "";
+                    }
                 }
                 else
                 {
@@ -80,8 +98,14 @@ namespace MFIService.config
             try
             {
                 //MS SQL
-                LocalConnectionString = @"Data Source=" + DatabaseConnection.REMOTE_HOST + "," + DatabaseConnection.REMOTE_PORT + ";Initial Catalog=" + DatabaseConnection.REMOTE_DATABASE + ";User ID=" + DatabaseConnection.REMOTE_USER + ";Password=" + DatabaseConnection.REMOTE_PASSWORD + "";
-                //LocalConnectionString = "Data Source=" + DatabaseConnection.REMOTE_HOST + "," + DatabaseConnection.REMOTE_PORT + ";Initial Catalog=" + DatabaseConnection.REMOTE_DATABASE + ";User ID=" + DatabaseConnection.REMOTE_USER + ";Password=" + DatabaseConnection.REMOTE_PASSWORD + "";
+                if (DatabaseConnection.REMOTE_PORT.Length > 0)
+                {
+                    LocalConnectionString = @"Data Source=" + DatabaseConnection.REMOTE_HOST + "," + DatabaseConnection.REMOTE_PORT + ";Initial Catalog=" + DatabaseConnection.REMOTE_DATABASE + ";User ID=" + DatabaseConnection.REMOTE_USER + ";Password=" + DatabaseConnection.REMOTE_PASSWORD + "";
+                }
+                else
+                {
+                    LocalConnectionString = @"Data Source=" + DatabaseConnection.REMOTE_HOST + ";Initial Catalog=" + DatabaseConnection.REMOTE_DATABASE + ";User ID=" + DatabaseConnection.REMOTE_USER + ";Password=" + DatabaseConnection.REMOTE_PASSWORD + "";
+                }
             }
             catch (ApplicationException e)
             {
@@ -89,6 +113,26 @@ namespace MFIService.config
             return LocalConnectionString;
         }
 
-    }
+        public Boolean IsConnection(SqlConnection aConn)
+        {
+            try
+            {
+                aConn.Open();
+                if (aConn.State == ConnectionState.Open)
+                {
+                    aConn.Close();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (SqlException se)
+            {
+                return false;
+            }
+        }
 
+    }
 }

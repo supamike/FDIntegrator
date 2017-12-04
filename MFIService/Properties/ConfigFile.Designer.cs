@@ -25,7 +25,7 @@ namespace MFIService.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        [global::System.Configuration.DefaultSettingValueAttribute("PSSPKAMLP110\\SQLEXPRESS")]
         public string local_host {
             get {
                 return ((string)(this["local_host"]));
@@ -61,7 +61,7 @@ namespace MFIService.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Palladium2020")]
+        [global::System.Configuration.DefaultSettingValueAttribute("MOUlin123")]
         public string local_password {
             get {
                 return ((string)(this["local_password"]));
@@ -128,6 +128,24 @@ namespace MFIService.Properties {
         public string local_database_technology {
             get {
                 return ((string)(this["local_database_technology"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("30000")]
+        public long sync_interval {
+            get {
+                return ((long)(this["sync_interval"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\\\MFI_Service_Log.txt")]
+        public string log_path {
+            get {
+                return ((string)(this["log_path"]));
             }
         }
     }

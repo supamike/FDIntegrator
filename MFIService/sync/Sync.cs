@@ -79,7 +79,6 @@ namespace MFIService.sync
                     {
                         quantity = 0;
                     }
-                    //MessageBox.Show("EXTRACTED:" + product_code);
                     String sql_to = "INSERT INTO stage_store_stock" +
                         "(" +
                         "cdc_date," +
@@ -102,18 +101,14 @@ namespace MFIService.sync
                         "'" + string.Format("{0:yyyy-MM-dd HH:mm}", DateTime.Now) + "'," +
                         0 + "" +
                         ") ";
-                    //Console.WriteLine(sql_to);
                     SqlConnection conn2 = new SqlConnection(DatabaseConnection.getRemoteConnectionString());
                     SqlCommand cmd2 = new SqlCommand(sql_to, conn2);
                     cmd2.Connection.Open();
                     cmd2.ExecuteNonQuery();
                     cmd2.Connection.Close();
-                    //MessageBox.Show("LOADED:" + product_code);
                     i = i + 1;
-                    //Console.WriteLine("Loaded:" + i);
                 }
                 dr.Close();
-                //MessageBox.Show("FINISHED");
             }
             catch (SqlException me)
             {

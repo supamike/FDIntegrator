@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using MFIService.sync;
 using MFIService.config;
+using System.IO;
 
 namespace MFIService
 {
@@ -27,9 +28,10 @@ namespace MFIService
             }
             MFIServiceEventLog.Source = "MFIServiceSource1";
             MFIServiceEventLog.Log = "MFIServiceLog";
+            DatabaseConnection.readConfigFile();
             // Set up a timer to trigger every set of time; note 1 min=60s=60000.  
             System.Timers.Timer timer = new System.Timers.Timer();
-            timer.Interval = 30000; // 60000=60 seconds  
+            timer.Interval = DatabaseConnection.SYNC_INTERVAL; // 60000=60 seconds  
             timer.Elapsed += new System.Timers.ElapsedEventHandler(this.OnTimer);
             timer.Start();
         }
@@ -38,27 +40,49 @@ namespace MFIService
         {
             try
             {
-                MFIServiceEventLog.WriteEntry("In onStart:Bfr Config");
-                DatabaseConnection.readConfigFile();
-                MFIServiceEventLog.WriteEntry("In onStart:Afr Config:" + DatabaseConnection.getLocalConnectionString());
+                this.WriteToFile("Started");
             }catch(Exception e)
             {
-                MFIServiceEventLog.WriteEntry("In onStart:Error");
+                this.WriteToFile("Error on start");
             }
         }
 
         protected override void OnStop()
         {
-            MFIServiceEventLog.WriteEntry("In onStop");
+            try
+            {
+                this.WriteToFile("Stopped");
+            }
+            catch (Exception e)
+            {
+                this.WriteToFile("Error on stop");
+            }
         }
 
         public void OnTimer(object sender, System.Timers.ElapsedEventArgs args)
         {
             // SYNC
             Sync SyncJob1 = new Sync();
-            MFIServiceEventLog.WriteEntry("Running-Bfr Sync", EventLogEntryType.Information, eventId++);
-            SyncJob1.SyncStoreStock();
-            MFIServiceEventLog.WriteEntry("Running-Afr Sync", EventLogEntryType.Information, eventId++);
+            try
+            {
+                this.WriteToFile("Sync store stock:started");
+                SyncJob1.SyncStoreStock();
+                this.WriteToFile("Sync store stock:ended");
+            }
+            catch(Exception e)
+            {
+                this.WriteToFile("Error:Sync store stock:" + e.Message);
+            }
+        }
+
+        public void WriteToFile(string text)
+        {
+            string path = DatabaseConnection.LOG_PATH;
+            using (StreamWriter writer = new StreamWriter(path, true))
+            {
+                writer.WriteLine(DateTime.Now.ToString("dd/MM/yy hh:mm:ss tt") + ": " + text);
+                writer.Close();
+            }
         }
     }
 }
