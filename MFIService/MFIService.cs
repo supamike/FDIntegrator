@@ -16,7 +16,7 @@ namespace MFIService
 {
     public partial class MFIService : ServiceBase
     {
-        int eventId=0;
+        int eventId = 0;
         public MFIService()
         {
             InitializeComponent();
@@ -40,10 +40,11 @@ namespace MFIService
         {
             try
             {
-                this.WriteToFile("Started");
-            }catch(Exception e)
+                this.WriteToFile("Service started");
+            }
+            catch (Exception e)
             {
-                this.WriteToFile("Error on start");
+                this.WriteToFile("Error on service start");
             }
         }
 
@@ -51,27 +52,68 @@ namespace MFIService
         {
             try
             {
-                this.WriteToFile("Stopped");
+                this.WriteToFile("Service stopped");
             }
             catch (Exception e)
             {
-                this.WriteToFile("Error on stop");
+                this.WriteToFile("Error on service stop");
             }
         }
 
         public void OnTimer(object sender, System.Timers.ElapsedEventArgs args)
         {
-            // SYNC
-            Sync SyncJob1 = new Sync();
-            try
+            // Start of sync Job after the configured time lap
+            this.WriteToFile("Sync job started");
+            //Check for connectivity to the local database server and only log if the connection has failed
+            if (DatabaseConnection.IsConnectionLocal())
             {
-                this.WriteToFile("Sync store stock:started");
-                SyncJob1.SyncStoreStock();
-                this.WriteToFile("Sync store stock:ended");
+                //Check for connectivity to the remote database server and only log if the connection has failed
+                if (DatabaseConnection.IsConnectionRemote())
+                {
+                    Sync SyncJob = new Sync();
+                    try
+                    {
+                        //SOHS. Stock on hand - store
+                        //a. Check availability of new records
+                        if (SyncJob.NewRecordsCount("intf_store_stock")>0)
+                        {
+                            //b. Check availability of remote connection
+                            if (DatabaseConnection.IsConnectionRemote())
+                            {
+                                //c. Update the log file: Before start of the entity sync
+                                this.WriteToFile("Sync entity start:store stock");
+                                //d. Insert new data into the remote database<<includes update of sync status.
+                                //d. Update the log with the results of the insert.
+                                this.WriteToFile("Sync entity end:store stock:" + SyncJob.SyncStoreStock());
+                            }
+                        }
+
+                        //SOHP. Stock on hand - pharmacy
+                        //SDPE. Stock dispensed
+                        //SA. Stock adjustment
+                        //SRQ. Stock requisition
+                        //SI. Stock issuing
+                        //SRT. Stock return
+                        //HFO. Health facility orders
+                        //GRN. Goods received
+                        //SDPO. Stock disposal
+                        //PV. Patient visit
+                    }
+                    catch (Exception e)
+                    {
+                        this.WriteToFile("Error:Sync store stock:" + e.Message);
+                    }
+                }
+                else
+                {
+                    this.WriteToFile("Remote database connection fail");
+                }
+                //Delete successfully synced data from the interface local database.
+                new Sync().DeleteSyncedRecords("intf_store_stock");
             }
-            catch(Exception e)
+            else
             {
-                this.WriteToFile("Error:Sync store stock:" + e.Message);
+                this.WriteToFile("Local database connection fail");
             }
         }
 

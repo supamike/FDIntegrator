@@ -148,5 +148,14 @@ namespace MFIService.Properties {
                 return ((string)(this["log_path"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public int sync_batch_size {
+            get {
+                return ((int)(this["sync_batch_size"]));
+            }
+        }
     }
 }

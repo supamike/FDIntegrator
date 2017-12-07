@@ -44,5 +44,8 @@
     <Setting Name="log_path" Type="System.String" Scope="Application">
       <Value Profile="(Default)">C:\\MFI_Service_Log.txt</Value>
     </Setting>
+    <Setting Name="sync_batch_size" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">50</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

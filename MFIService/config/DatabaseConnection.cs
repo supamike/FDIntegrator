@@ -25,12 +25,17 @@ namespace MFIService.config
         private static String LOCAL_DATABASE_TECHNOLOGY = "";
         public static long SYNC_INTERVAL = 3600000;//60000=1 min
         public static String LOG_PATH = "C:\\MFI_Service_Log.txt";
+        public static int SYNC_BATCH_SIZE = 50;
 
         public static void readConfigFile()
         {
             if (Properties.ConfigFile.Default.sync_interval > 0)
             {
                 DatabaseConnection.SYNC_INTERVAL = Properties.ConfigFile.Default.sync_interval;
+            }
+            if (Properties.ConfigFile.Default.sync_batch_size > 0)
+            {
+                DatabaseConnection.SYNC_BATCH_SIZE = Properties.ConfigFile.Default.sync_batch_size;
             }
             if (Properties.ConfigFile.Default.log_path.Length > 0)
             {
@@ -113,8 +118,52 @@ namespace MFIService.config
             return LocalConnectionString;
         }
 
-        public Boolean IsConnection(SqlConnection aConn)
+        public static Boolean IsConnection(SqlConnection aConn)
         {
+            try
+            {
+                aConn.Open();
+                if (aConn.State == ConnectionState.Open)
+                {
+                    aConn.Close();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (SqlException se)
+            {
+                return false;
+            }
+        }
+
+        public static Boolean IsConnectionRemote()
+        {
+            SqlConnection aConn = new SqlConnection(DatabaseConnection.getRemoteConnectionString());
+            try
+            {
+                aConn.Open();
+                if (aConn.State == ConnectionState.Open)
+                {
+                    aConn.Close();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (SqlException se)
+            {
+                return false;
+            }
+        }
+
+        public static Boolean IsConnectionLocal()
+        {
+            SqlConnection aConn = new SqlConnection(DatabaseConnection.getLocalConnectionString());
             try
             {
                 aConn.Open();

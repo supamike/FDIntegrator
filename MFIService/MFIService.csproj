@@ -63,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="config\DatabaseConnection.cs" />
+    <Compile Include="entity\store_stock.cs" />
     <Compile Include="MFIService.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -93,7 +94,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="entity\" />
     <Folder Include="listener\" />
     <Folder Include="script\" />
   </ItemGroup>

@@ -7,115 +7,238 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using MFIService.config;
+using MFIService.entity;
 
 namespace MFIService.sync
 {
     class Sync
     {
-        public void SyncStoreStock()
+        public String SyncStoreStock()
         {
-            String facility_code;
-            DateTime cdc_date;
-            String product_code;
-            String unit_code;
-            String batch_number;
-            float quantity;
+            int Loops = 1;
+            int loop = 1;
+            long TotalRecords= this.NewRecordsCount("intf_store_stock");
+            float RecordsBatchFactor = TotalRecords/DatabaseConnection.SYNC_BATCH_SIZE;
+            Loops = (Int32)Math.Ceiling(RecordsBatchFactor);
             int i = 0;
-            //TOP 100 
-            String sql_from = "SELECT * FROM intf_store_stock WHERE 1=1";
+            int SyncPass = 0;
+            store_stock StoreStock = null;
+            while (loop <= Loops)
+            {
+                String sql_from = "SELECT * FROM intf_store_stock WHERE sync_status=0";
+                try
+                {
+                    SqlConnection conn = new SqlConnection(DatabaseConnection.getLocalConnectionString());
+                    SqlCommand cmd = new SqlCommand(sql_from, conn);
+                    cmd.Connection.Open();
+                    SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+                    while (dr.Read())
+                    {
+                        StoreStock = new store_stock();
+                        this.SetStoreStock(StoreStock, dr);
+                        if (this.InsertStoreStock(StoreStock) == 1)
+                        {
+                            //update sync status
+                            SyncPass = SyncPass + 1;
+                            this.UpdateLocalSyncStatus("intf_store_stock", "intf_store_stock_id", 1, StoreStock.intf_store_stock_id);
+                        }
+                        StoreStock = null;
+                        i = i + 1;
+                    }
+                    dr.Close();
+                }
+                catch (SqlException me)
+                {
+                    //
+                }
+
+                loop = loop + 1;
+            }
+            return SyncPass + "/" + TotalRecords + " Synced";
+        }
+
+        public void SetStoreStock (store_stock StoreStock,SqlDataReader dr)
+        {
+            try
+            {
+                StoreStock.intf_store_stock_id = Convert.ToInt64(dr["intf_store_stock_id"]);
+            }
+            catch (InvalidCastException ice)
+            {
+                StoreStock.intf_store_stock_id = 0;
+            }
+            try
+            {
+                StoreStock.facility_code = Convert.ToString(dr["facility_code"]);
+            }
+            catch (InvalidCastException ice)
+            {
+                StoreStock.facility_code = "";
+            }
+            try
+            {
+                StoreStock.product_code = Convert.ToString(dr["product_code"]);
+            }
+            catch (InvalidCastException ice)
+            {
+                StoreStock.product_code = "";
+            }
+            try
+            {
+                StoreStock.unit_code = Convert.ToString(dr["unit_code"]);
+            }
+            catch (InvalidCastException ice)
+            {
+                StoreStock.unit_code = "";
+            }
+            try
+            {
+                StoreStock.batch_number = Convert.ToString(dr["batch_number"]);
+            }
+            catch (InvalidCastException ice)
+            {
+                StoreStock.batch_number = "";
+            }
+            try
+            {
+                StoreStock.cdc_date = Convert.ToDateTime(dr["cdc_date"]);
+            }
+            catch (InvalidCastException ice)
+            {
+                StoreStock.cdc_date = Convert.ToDateTime(null);
+            }
+            try
+            {
+                StoreStock.quantity = Convert.ToSingle(dr["quantity"]);
+            }
+            catch (InvalidCastException ice)
+            {
+                StoreStock.quantity = 0;
+            }
+            try
+            {
+                StoreStock.manufacture_date = Convert.ToDateTime(dr["manufacture_date"]);
+            }
+            catch (InvalidCastException ice)
+            {
+                StoreStock.manufacture_date = Convert.ToDateTime(null);
+            }
+            try
+            {
+                StoreStock.expiry_date = Convert.ToDateTime(dr["expiry_date"]);
+            }
+            catch (InvalidCastException ice)
+            {
+                StoreStock.expiry_date = Convert.ToDateTime(null);
+            }
+        }
+
+        public int InsertStoreStock(store_stock StoreStock)
+        {
+            int status = 0;
+            try
+            {
+                String sql_to = "INSERT INTO stage_store_stock" +
+                                "(" +
+                                "cdc_date," +
+                                "intf_product_code," +
+                                "intf_facility_code," +
+                                "intf_unit_code," +
+                                "batch_number," +
+                                "quantity," +
+                                "add_date," +
+                                "load_status," +
+                                "manufacture_date," +
+                                "expiry_date" +
+                                ") " +
+                                " VALUES" +
+                                "(" +
+                                "'" + string.Format("{0:yyyy-MM-dd HH:mm}", StoreStock.cdc_date) + "','" +
+                                StoreStock.product_code + "','" +
+                                StoreStock.facility_code + "','" +
+                                StoreStock.unit_code + "','" +
+                                StoreStock.batch_number + "'," +
+                                StoreStock.quantity + "," +
+                                "'" + string.Format("{0:yyyy-MM-dd HH:mm}", DateTime.Now) + "'," +
+                                0 + "," +
+                                "'" + string.Format("{0:yyyy-MM-dd HH:mm}", StoreStock.manufacture_date) + "'," +
+                                "'" + string.Format("{0:yyyy-MM-dd HH:mm}", StoreStock.expiry_date) + "'" +
+                                ") ";
+                SqlConnection conn = new SqlConnection(DatabaseConnection.getRemoteConnectionString());
+                SqlCommand cmd = new SqlCommand(sql_to, conn);
+                cmd.Connection.Open();
+                cmd.ExecuteNonQuery();
+                status = 1;
+                cmd.Connection.Close();
+            }catch(Exception e)
+            {
+                status = 0;
+            }
+            return status;
+        }
+
+        public void UpdateLocalSyncStatus(String TableName, String IdColumn,int Status,long RecordId)
+        {
+            try
+            {
+                String sql = "UPDATE " + TableName + " SET sync_status=" + Status + " WHERE " + IdColumn + "=" + RecordId;
+                SqlConnection conn = new SqlConnection(DatabaseConnection.getLocalConnectionString());
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Connection.Open();
+                cmd.ExecuteNonQuery();
+                cmd.Connection.Close();
+            }
+            catch (Exception e)
+            {
+                //
+            }
+        }
+
+        public long NewRecordsCount(String TableName)
+        {
+            long n = 0;
+            String sql_from = "SELECT COUNT(*) as row_count FROM " + TableName + " WHERE sync_status=0";
             try
             {
                 SqlConnection conn = new SqlConnection(DatabaseConnection.getLocalConnectionString());
                 SqlCommand cmd = new SqlCommand(sql_from, conn);
                 cmd.Connection.Open();
                 SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
-                while (dr.Read())
+                if (dr.Read())
                 {
                     try
                     {
-                        facility_code = Convert.ToString(dr["facility_code"]);
+                        n = Convert.ToInt64(dr["row_count"]);
                     }
                     catch (InvalidCastException ice)
                     {
-                        facility_code = "";
+                        n = 0;
                     }
-                    try
-                    {
-                        product_code = Convert.ToString(dr["product_code"]);
-                    }
-                    catch (InvalidCastException ice)
-                    {
-                        product_code = "";
-                    }
-                    try
-                    {
-                        unit_code = Convert.ToString(dr["unit_code"]);
-                    }
-                    catch (InvalidCastException ice)
-                    {
-                        unit_code = "";
-                    }
-                    try
-                    {
-                        batch_number = Convert.ToString(dr["batch_number"]);
-                    }
-                    catch (InvalidCastException ice)
-                    {
-                        batch_number = "";
-                    }
-                    try
-                    {
-                        cdc_date = Convert.ToDateTime(dr["cdc_date"]);
-                    }
-                    catch (InvalidCastException ice)
-                    {
-                        cdc_date = Convert.ToDateTime(null);
-                    }
-                    try
-                    {
-                        quantity = Convert.ToSingle(dr["quantity"]);
-                    }
-                    catch (InvalidCastException ice)
-                    {
-                        quantity = 0;
-                    }
-                    String sql_to = "INSERT INTO stage_store_stock" +
-                        "(" +
-                        "cdc_date," +
-                        "intf_product_code," +
-                        "intf_facility_code," +
-                        "intf_unit_code," +
-                        "batch_number," +
-                        "quantity," +
-                        "add_date," +
-                        "load_status" +
-                        ") " +
-                        " VALUES" +
-                        "(" +
-                        "'" + string.Format("{0:yyyy-MM-dd HH:mm}", cdc_date) + "','" +
-                        product_code + "','" +
-                        facility_code + "','" +
-                        unit_code + "','" +
-                        batch_number + "'," +
-                        quantity + "," +
-                        "'" + string.Format("{0:yyyy-MM-dd HH:mm}", DateTime.Now) + "'," +
-                        0 + "" +
-                        ") ";
-                    SqlConnection conn2 = new SqlConnection(DatabaseConnection.getRemoteConnectionString());
-                    SqlCommand cmd2 = new SqlCommand(sql_to, conn2);
-                    cmd2.Connection.Open();
-                    cmd2.ExecuteNonQuery();
-                    cmd2.Connection.Close();
-                    i = i + 1;
                 }
                 dr.Close();
             }
             catch (SqlException me)
             {
-                Console.WriteLine(me.StackTrace);
+                n = 0;
             }
-
+            return n;
         }
 
+        public void DeleteSyncedRecords(String TableName)
+        {
+            try
+            {
+                String sql = "DELETE FROM " + TableName + " WHERE sync_status=1";
+                SqlConnection conn = new SqlConnection(DatabaseConnection.getLocalConnectionString());
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Connection.Open();
+                cmd.ExecuteNonQuery();
+                cmd.Connection.Close();
+            }
+            catch (Exception e)
+            {
+                //
+            }
+        }
     }
 }
