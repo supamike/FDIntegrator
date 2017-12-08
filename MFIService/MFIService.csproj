@@ -63,6 +63,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="config\DatabaseConnection.cs" />
+    <Compile Include="entity\pharmacy_stock.cs" />
+    <Compile Include="entity\stock_return.cs" />
+    <Compile Include="entity\stock_issue.cs" />
     <Compile Include="entity\store_stock.cs" />
     <Compile Include="MFIService.cs">
       <SubType>Component</SubType>
