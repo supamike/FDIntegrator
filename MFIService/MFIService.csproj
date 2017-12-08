@@ -98,6 +98,7 @@
     <Compile Include="sync\SyncStockRequisition.cs" />
     <Compile Include="sync\SyncStockIssue.cs" />
     <Compile Include="sync\SyncStockAdjustment.cs" />
+    <Compile Include="sync\SyncPharmacyStock .cs" />
     <Compile Include="sync\SyncStoreStock.cs" />
     <Compile Include="sync\Sync.cs" />
   </ItemGroup>
