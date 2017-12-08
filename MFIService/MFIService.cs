@@ -16,7 +16,6 @@ namespace MFIService
 {
     public partial class MFIService : ServiceBase
     {
-        int eventId = 0;
         public MFIService()
         {
             InitializeComponent();
@@ -63,7 +62,7 @@ namespace MFIService
         public void OnTimer(object sender, System.Timers.ElapsedEventArgs args)
         {
             // Start of sync Job after the configured time lap
-            this.WriteToFile("Sync job started");
+            this.WriteToFile("Sync process initiated/resumed");
             //Check for connectivity to the local database server and only log if the connection has failed
             if (DatabaseConnection.IsConnectionLocal())
             {

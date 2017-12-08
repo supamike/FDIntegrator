@@ -17,8 +17,8 @@ namespace MFIService.sync
         {
             int Loops = 1;
             int loop = 1;
-            long TotalRecords= this.NewRecordsCount("intf_store_stock");
-            float RecordsBatchFactor = TotalRecords/DatabaseConnection.SYNC_BATCH_SIZE;
+            double TotalRecords= this.NewRecordsCount("intf_store_stock");
+            double RecordsBatchFactor = TotalRecords/DatabaseConnection.SYNC_BATCH_SIZE;
             Loops = (Int32)Math.Ceiling(RecordsBatchFactor);
             int i = 0;
             int SyncPass = 0;
@@ -54,7 +54,7 @@ namespace MFIService.sync
 
                 loop = loop + 1;
             }
-            return SyncPass + "/" + TotalRecords + " Synced";
+            return SyncPass + "/" + TotalRecords + " Synced" + " Loops:" + Loops;
         }
 
         public void SetStoreStock (store_stock StoreStock,SqlDataReader dr)
