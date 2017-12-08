@@ -14,7 +14,6 @@ namespace MFIService.entity
         public DateTime order_date { get; set; }
         public String product_code { get; set; }
         public DateTime edt_date { get; set; }
-        public String product_code { get; set; }
         public String unit_code { get; set; }
         public String batch_number { get; set; }
         public float quantity { get; set; }

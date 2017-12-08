@@ -83,7 +83,7 @@ namespace MFIService
                                 this.WriteToFile("Sync entity start:store stock");
                                 //d. Insert new data into the remote database<<includes update of sync status.
                                 //d. Update the log with the results of the insert.
-                                this.WriteToFile("Sync entity end:store stock:" + SyncJob.SyncStoreStock());
+                                this.WriteToFile("Sync entity end:store stock:" + new SyncStoreStock().Sync());
                             }
                         }
 

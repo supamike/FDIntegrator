@@ -63,7 +63,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="config\DatabaseConnection.cs" />
+    <Compile Include="entity\facility_config.cs" />
+    <Compile Include="entity\goods_received.cs" />
+    <Compile Include="entity\health_facility_order.cs" />
+    <Compile Include="entity\patient_visit.cs" />
     <Compile Include="entity\pharmacy_stock.cs" />
+    <Compile Include="entity\stock_dispensed.cs" />
+    <Compile Include="entity\stock_disposed.cs" />
+    <Compile Include="entity\stock_requisition.cs" />
     <Compile Include="entity\stock_return.cs" />
     <Compile Include="entity\stock_issue.cs" />
     <Compile Include="entity\store_stock.cs" />
@@ -87,6 +94,7 @@
       <DependentUpon>ConfigFile.settings</DependentUpon>
     </Compile>
     <Compile Include="security\Security.cs" />
+    <Compile Include="sync\SyncStoreStock.cs" />
     <Compile Include="sync\Sync.cs" />
   </ItemGroup>
   <ItemGroup>
