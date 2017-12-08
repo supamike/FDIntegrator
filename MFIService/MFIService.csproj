@@ -63,6 +63,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="config\DatabaseConnection.cs" />
+    <Compile Include="entity\facility_config.cs" />
+    <Compile Include="entity\stock_disposed.cs" />
+    <Compile Include="entity\stock_dispensed.cs" />
+    <Compile Include="entity\patient_visit.cs" />
     <Compile Include="entity\store_stock.cs" />
     <Compile Include="MFIService.cs">
       <SubType>Component</SubType>
