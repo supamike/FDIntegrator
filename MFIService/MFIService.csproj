@@ -95,6 +95,10 @@
       <DependentUpon>ConfigFile.settings</DependentUpon>
     </Compile>
     <Compile Include="security\Security.cs" />
+    <Compile Include="sync\SyncFacilityConfig.cs" />
+    <Compile Include="sync\SyncPatientVisit.cs" />
+    <Compile Include="sync\SyncStockDispensed.cs" />
+    <Compile Include="sync\SyncStockDisposed.cs" />
     <Compile Include="sync\SyncStockRequisition.cs" />
     <Compile Include="sync\SyncStockIssue.cs" />
     <Compile Include="sync\SyncStockAdjustment.cs" />
