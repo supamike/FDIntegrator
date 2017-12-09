@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MFIService.entity
 {
-    class intf_health_facility_order
+    class health_facility_order
     {
         public long intf_health_facility_order_id { get; set; }
         public String facility_code { get; set; }
