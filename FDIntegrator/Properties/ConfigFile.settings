@@ -1,0 +1,51 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="FDIntegrator.Properties" GeneratedClassName="ConfigFile">
+  <Profiles />
+  <Settings>
+    <Setting Name="local_host" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">localhost</Value>
+    </Setting>
+    <Setting Name="local_database" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">FDMS_INTERFACE</Value>
+    </Setting>
+    <Setting Name="local_port" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">1433</Value>
+    </Setting>
+    <Setting Name="local_user" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">sa</Value>
+    </Setting>
+    <Setting Name="local_password" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Palladium2020</Value>
+    </Setting>
+    <Setting Name="remote_host" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">MEDACCKAMTEST01</Value>
+    </Setting>
+    <Setting Name="remote_database" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">iFDMS_CORE</Value>
+    </Setting>
+    <Setting Name="remote_port" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">1433</Value>
+    </Setting>
+    <Setting Name="remote_user" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">sa</Value>
+    </Setting>
+    <Setting Name="remote_password" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Palladium2020</Value>
+    </Setting>
+    <Setting Name="passwords_are_encrypted" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="local_database_technology" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">MSSQL</Value>
+    </Setting>
+    <Setting Name="sync_interval" Type="System.Int64" Scope="Application">
+      <Value Profile="(Default)">30000</Value>
+    </Setting>
+    <Setting Name="log_path" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">D:\\WENCE.BENDA\\MY.PALLADIUM\\FDIntegrator\\FDIntegrator_Log.txt</Value>
+    </Setting>
+    <Setting Name="sync_batch_size" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">50</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
