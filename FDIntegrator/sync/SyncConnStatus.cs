@@ -11,21 +11,21 @@ using FDIntegrator.entity;
 
 namespace FDIntegrator.sync
 {
-    class SyncStockRequisition
+    class SyncConnStatus
     {
         public String Sync()
         {
             int Loops = 1;
             int loop = 1;
-            double TotalRecords= new Sync().NewRecordsCount("intf_stock_requisition");
+            double TotalRecords= new Sync().NewRecordsCount("intf_conn_status");
             double RecordsBatchFactor = TotalRecords/DatabaseConnection.SYNC_BATCH_SIZE;
             Loops = (Int32)Math.Ceiling(RecordsBatchFactor);
             int i = 0;
             int SyncPass = 0;
-            stock_requisition StockRequisition = null;
+            conn_status ConnStatus = null;
             while (loop <= Loops)
             {
-                String sql_from = "SELECT * FROM intf_stock_requisition WHERE sync_status=0";
+                String sql_from = "SELECT * FROM intf_conn_status WHERE sync_status=0";
                 try
                 {
                     SqlConnection conn = new SqlConnection(DatabaseConnection.getLocalConnectionString());
@@ -34,15 +34,15 @@ namespace FDIntegrator.sync
                     SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
                     while (dr.Read())
                     {
-                        StockRequisition = new stock_requisition();
-                        this.SetStockRequisition(StockRequisition, dr);
-                        if (this.InsertStockRequisition(StockRequisition) == 1)
+                        ConnStatus = new conn_status();
+                        this.SetConnStatus(ConnStatus, dr);
+                        if (this.InsertConnStatus(ConnStatus) == 1)
                         {
                             //update sync status
                             SyncPass = SyncPass + 1;
-                            new Sync().UpdateLocalSyncStatus("intf_stock_requisition", "intf_stock_requisition_id", 1, StockRequisition.intf_stock_requisition_id);
+                            new Sync().UpdateLocalSyncStatus("intf_conn_status", "intf_conn_status_id", 1, ConnStatus.intf_conn_status_id);
                         }
-                        StockRequisition = null;
+                        ConnStatus = null;
                         i = i + 1;
                     }
                     dr.Close();
@@ -57,104 +57,93 @@ namespace FDIntegrator.sync
             return SyncPass + "/" + TotalRecords + " Synced" + " Loops:" + Loops;
         }
 
-        public void SetStockRequisition (stock_requisition StockRequisition,SqlDataReader dr)
+        public void SetConnStatus (conn_status ConnStatus,SqlDataReader dr)
         {
             try
             {
-                StockRequisition.intf_stock_requisition_id = Convert.ToInt64(dr["intf_stock_requisition_id"]);
+                ConnStatus.intf_conn_status_id = Convert.ToInt64(dr["intf_conn_status_id"]);
             }
             catch (InvalidCastException ice)
             {
-                StockRequisition.intf_stock_requisition_id = 0;
+                ConnStatus.intf_conn_status_id = 0;
             }
             try
             {
-                StockRequisition.facility_code = Convert.ToString(dr["intf_facility_code"]);
+                ConnStatus.facility_code = Convert.ToString(dr["facility_code"]);
             }
             catch (InvalidCastException ice)
             {
-                StockRequisition.facility_code = "";
+                ConnStatus.facility_code = "";
             }
             try
             {
-                StockRequisition.product_code = Convert.ToString(dr["intf_product_code"]);
+                ConnStatus.cdc_date = Convert.ToDateTime(dr["cdc_date"]);
             }
             catch (InvalidCastException ice)
             {
-                StockRequisition.product_code = "";
+                ConnStatus.cdc_date = Convert.ToDateTime(null);
             }
             try
             {
-                StockRequisition.unit_code = Convert.ToString(dr["intf_unit_code"]);
+                ConnStatus.status_date = Convert.ToDateTime(dr["status_date"]);
             }
             catch (InvalidCastException ice)
             {
-                StockRequisition.unit_code = "";
+                ConnStatus.status_date = Convert.ToDateTime(null);
+            }
+
+            try
+            {
+                ConnStatus.status_dispense_mode = Convert.ToInt16(dr["status_dispense_mode"]);
+            }
+            catch (InvalidCastException ice)
+            {
+                ConnStatus.status_dispense_mode = 0;
             }
             try
             {
-                StockRequisition.requisition_number = Convert.ToString(dr["requisition_number"]);
+                ConnStatus.status_dispense_mode_data = Convert.ToInt16(dr["status_dispense_mode_data"]);
             }
             catch (InvalidCastException ice)
             {
-                StockRequisition.requisition_number = "";
+                ConnStatus.status_dispense_mode_data = 0;
             }
             try
             {
-                StockRequisition.requisition_date = Convert.ToDateTime(dr["requisition_date"]);
+                ConnStatus.status_connect = Convert.ToInt16(dr["status_connect"]);
             }
             catch (InvalidCastException ice)
             {
-                StockRequisition.requisition_date = Convert.ToDateTime(null);
-            }
-            try
-            {
-                StockRequisition.cdc_date = Convert.ToDateTime(dr["cdc_date"]);
-            }
-            catch (InvalidCastException ice)
-            {
-                StockRequisition.cdc_date = Convert.ToDateTime(null);
-            }
-            try
-            {
-                StockRequisition.quantity = Convert.ToSingle(dr["quantity"]);
-            }
-            catch (InvalidCastException ice)
-            {
-                StockRequisition.quantity = 0;
+                ConnStatus.status_connect = 0;
             }
         }
 
-        public int InsertStockRequisition(stock_requisition StockRequisition)
+        public int InsertConnStatus(conn_status ConnStatus)
         {
             int status = 0;
             try
             {
-                String sql_to = "INSERT INTO intf_stock_requisition" +
+                String sql_to = "INSERT INTO intf_conn_status" +
                                 "(" +
-                                "intf_stock_requisition_id," +
+                                "intf_conn_status_id," +
                                 "cdc_date," +
-                                "requisition_date," +
-                                "intf_product_code," +
-                                "intf_facility_code," +
-                                "intf_unit_code," +
-                                "quantity," +
-                                "requisition_number," +
+                                "status_date," +
+                                "status_connect," +
+                                "status_dispense_mode," +
+                                "status_dispense_mode_data," +
                                 "add_date," +
                                 "load_status" +
                                 ") " +
                                 " VALUES" +
                                 "(" +
-                                StockRequisition.intf_stock_requisition_id + "," +
-                                "'" + string.Format("{0:yyyy-MM-dd HH:mm}", StockRequisition.cdc_date) + "','" +
-                                "'" + string.Format("{0:yyyy-MM-dd HH:mm}", StockRequisition.requisition_date) + "'," +
-                                StockRequisition.product_code + "','" +
-                                StockRequisition.facility_code + "','" +
-                                StockRequisition.unit_code + "','" +
-                                StockRequisition.quantity + "," +
-                                StockRequisition.requisition_number + "'," +
+                                ConnStatus.intf_conn_status_id + "," +
+                                "'" + string.Format("{0:yyyy-MM-dd HH:mm}", ConnStatus.cdc_date) + "','" +
+                                "'" + string.Format("{0:yyyy-MM-dd HH:mm}", ConnStatus.status_date) + "','" +
+                                ConnStatus.status_connect + "','" +
+                                ConnStatus.status_dispense_mode + "','" +
+                                ConnStatus.status_dispense_mode_data + "','" +
                                 "'" + string.Format("{0:yyyy-MM-dd HH:mm}", DateTime.Now) + "'," +
-                                0 + "," +
+                                0 + 
                                 ") ";
                 SqlConnection conn = new SqlConnection(DatabaseConnection.getRemoteConnectionString());
                 SqlCommand cmd = new SqlCommand(sql_to, conn);

@@ -30,6 +30,7 @@ namespace FDIntegrator.sync
                 {
                     SqlConnection conn = new SqlConnection(DatabaseConnection.getLocalConnectionString());
                     SqlCommand cmd = new SqlCommand(sql_from, conn);
+                    //cmd.CommandType=CommandType.Text;
                     cmd.Connection.Open();
                     SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
                     while (dr.Read())
@@ -47,9 +48,9 @@ namespace FDIntegrator.sync
                     }
                     dr.Close();
                 }
-                catch (SqlException me)
+                catch (Exception e)
                 {
-                    //
+                    Console.WriteLine("Sync_goods_received:" + e.StackTrace);
                 }
 
                 loop = loop + 1;
@@ -69,7 +70,7 @@ namespace FDIntegrator.sync
             }
             try
             {
-                GoodsReceived.facility_code = Convert.ToString(dr["facility_code"]);
+                GoodsReceived.facility_code = Convert.ToString(dr["intf_facility_code"]);
             }
             catch (InvalidCastException ice)
             {
@@ -77,7 +78,7 @@ namespace FDIntegrator.sync
             }
             try
             {
-                GoodsReceived.product_code = Convert.ToString(dr["product_code"]);
+                GoodsReceived.product_code = Convert.ToString(dr["intf_product_code"]);
             }
             catch (InvalidCastException ice)
             {
@@ -93,7 +94,23 @@ namespace FDIntegrator.sync
             }
             try
             {
-                GoodsReceived.unit_code = Convert.ToString(dr["unit_code"]);
+                GoodsReceived.whs_grn_ref = Convert.ToString(dr["whs_grn_ref"]);
+            }
+            catch (InvalidCastException ice)
+            {
+                GoodsReceived.whs_grn_ref = "";
+            }
+            try
+            {
+                GoodsReceived.order_number = Convert.ToString(dr["order_number"]);
+            }
+            catch (InvalidCastException ice)
+            {
+                GoodsReceived.order_number = "";
+            }
+            try
+            {
+                GoodsReceived.unit_code = Convert.ToString(dr["intf_unit_code"]);
             }
             catch (InvalidCastException ice)
             {
@@ -166,11 +183,15 @@ namespace FDIntegrator.sync
                                 "(" +
                                 "intf_goods_received_id," +
                                 "cdc_date," +
+                                "receipt_date," +
+                                "receipt_number," +
                                 "intf_product_code," +
-                                "intf_supplier_code," +
+                                "supplier_code," +
                                 "intf_facility_code," +
                                 "intf_unit_code," +
                                 "batch_number," +
+                                "order_number," +
+                                "whs_grn_ref," +
                                 "quantity," +
                                 "add_date," +
                                 "load_status," +
@@ -180,20 +201,23 @@ namespace FDIntegrator.sync
                                 " VALUES" +
                                 "(" +
                                 GoodsReceived.intf_goods_received_id + "," +
-                                "'" + string.Format("{0:yyyy-MM-dd HH:mm}", GoodsReceived.cdc_date) + "','" +
+                                "'" + string.Format("{0:yyyy-MM-dd HH:mm}", GoodsReceived.cdc_date) + "'," +
                                  "'" + string.Format("{0:yyyy-MM-dd HH:mm}", GoodsReceived.receipt_date) + "','" +
+                                 GoodsReceived.receipt_number + "','" +
                                 GoodsReceived.product_code + "','" +
                                 GoodsReceived.supplier_code + "','" +
                                 GoodsReceived.facility_code + "','" +
                                 GoodsReceived.unit_code + "','" +
-                                GoodsReceived.batch_number + "'," +
-                                 GoodsReceived.order_number + "'," +
+                                GoodsReceived.batch_number + "','" +
+                                GoodsReceived.order_number + "','" +
+                                GoodsReceived.whs_grn_ref + "'," +
                                 GoodsReceived.quantity + "," +
                                 "'" + string.Format("{0:yyyy-MM-dd HH:mm}", DateTime.Now) + "'," +
                                 0 + "," +
                                 "'" + string.Format("{0:yyyy-MM-dd HH:mm}", GoodsReceived.manufacture_date) + "'," +
                                 "'" + string.Format("{0:yyyy-MM-dd HH:mm}", GoodsReceived.expiry_date) + "'" +
                                 ") ";
+                //Console.WriteLine(sql_to);
                 SqlConnection conn = new SqlConnection(DatabaseConnection.getRemoteConnectionString());
                 SqlCommand cmd = new SqlCommand(sql_to, conn);
                 cmd.Connection.Open();
@@ -203,6 +227,7 @@ namespace FDIntegrator.sync
             }
             catch (Exception e)
             {
+                Console.WriteLine(e.StackTrace);
                 status = 0;
             }
             return status;

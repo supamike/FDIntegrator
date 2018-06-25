@@ -47,9 +47,9 @@ namespace FDIntegrator.sync
                     }
                     dr.Close();
                 }
-                catch (SqlException me)
+                catch (Exception e)
                 {
-                    //
+                    Console.WriteLine("Sync_facility_order:" + e.StackTrace);
                 }
 
                 loop = loop + 1;
@@ -69,7 +69,7 @@ namespace FDIntegrator.sync
             }
             try
             {
-                FacilityOrder.facility_code = Convert.ToString(dr["facility_code"]);
+                FacilityOrder.facility_code = Convert.ToString(dr["intf_facility_code"]);
             }
             catch (InvalidCastException ice)
             {
@@ -77,7 +77,15 @@ namespace FDIntegrator.sync
             }
             try
             {
-                FacilityOrder.product_code = Convert.ToString(dr["product_code"]);
+                FacilityOrder.supplier_code = Convert.ToString(dr["supplier_code"]);
+            }
+            catch (InvalidCastException ice)
+            {
+                FacilityOrder.supplier_code = "";
+            }
+            try
+            {
+                FacilityOrder.product_code = Convert.ToString(dr["intf_product_code"]);
             }
             catch (InvalidCastException ice)
             {
@@ -85,7 +93,7 @@ namespace FDIntegrator.sync
             }
             try
             {
-                FacilityOrder.unit_code = Convert.ToString(dr["unit_code"]);
+                FacilityOrder.unit_code = Convert.ToString(dr["intf_unit_code"]);
             }
             catch (InvalidCastException ice)
             {
@@ -109,11 +117,11 @@ namespace FDIntegrator.sync
             }
             try
             {
-                FacilityOrder.batch_number = Convert.ToString(dr["batch_number"]);
+                FacilityOrder.whs_order_ref = Convert.ToString(dr["whs_order_ref"]);
             }
             catch (InvalidCastException ice)
             {
-                FacilityOrder.batch_number = "";
+                FacilityOrder.whs_order_ref = "";
             }
             try
             {
@@ -125,11 +133,11 @@ namespace FDIntegrator.sync
             }
             try
             {
-                FacilityOrder.edt_date = Convert.ToDateTime(dr["edt_date"]);
+                FacilityOrder.edd_date = Convert.ToDateTime(dr["edd_date"]);
             }
             catch (InvalidCastException ice)
             {
-                FacilityOrder.edt_date = Convert.ToDateTime(null);
+                FacilityOrder.edd_date = Convert.ToDateTime(null);
             }
             try
             {
@@ -151,32 +159,35 @@ namespace FDIntegrator.sync
                                 "(" +
                                 "intf_facility_order_id," +
                                 "cdc_date," +
+                                "order_date," +
+                                "edd_date," +
                                 "intf_product_code," +
                                 "intf_facility_code," +
                                 "intf_unit_code," +
-                                "intf_supplier_code," +
-                                "batch_number," +
+                                "supplier_code," +
+                                "order_number," +
+                                "whs_order_ref," +
                                 "quantity," +
                                 "add_date," +
-                                "load_status," +
-                                "manufacture_date," +
-                                "expiry_date" +
+                                "load_status" +
                                 ") " +
                                 " VALUES" +
                                 "(" +
                                 FacilityOrder.intf_facility_order_id + "," +
-                                "'" + string.Format("{0:yyyy-MM-dd HH:mm}", FacilityOrder.cdc_date) + "','" +
-                                 "'" + string.Format("{0:yyyy-MM-dd HH:mm}", FacilityOrder.order_date) + "','" +
-                                 "'" + string.Format("{0:yyyy-MM-dd HH:mm}", FacilityOrder.edt_date) + "','" +
+                                "'" + string.Format("{0:yyyy-MM-dd HH:mm}", FacilityOrder.cdc_date) + "'," +
+                                 "'" + string.Format("{0:yyyy-MM-dd HH:mm}", FacilityOrder.order_date) + "'," +
+                                 "'" + string.Format("{0:yyyy-MM-dd HH:mm}", FacilityOrder.edd_date) + "','" +
                                 FacilityOrder.product_code + "','" +
                                 FacilityOrder.facility_code + "','" +
                                 FacilityOrder.unit_code + "','" +
-                                FacilityOrder.batch_number + "'," +
+                                FacilityOrder.supplier_code + "','" +
+                                FacilityOrder.order_number + "','" +
+                                FacilityOrder.whs_order_ref + "'," +
                                 FacilityOrder.quantity + "," +
                                 "'" + string.Format("{0:yyyy-MM-dd HH:mm}", DateTime.Now) + "'," +
-                                0 + "," +
-                               
+                                0 +
                                 ") ";
+                //Console.WriteLine(sql_to);
                 SqlConnection conn = new SqlConnection(DatabaseConnection.getRemoteConnectionString());
                 SqlCommand cmd = new SqlCommand(sql_to, conn);
                 cmd.Connection.Open();
@@ -186,6 +197,7 @@ namespace FDIntegrator.sync
             }
             catch (Exception e)
             {
+                Console.WriteLine(e.StackTrace);
                 status = 0;
             }
             return status;

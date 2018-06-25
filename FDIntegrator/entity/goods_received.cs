@@ -21,6 +21,7 @@ namespace FDIntegrator.entity
     public String order_number { get; set; }
     public DateTime manufacture_date { get; set; }
     public DateTime expiry_date { get; set; }
+    public String whs_grn_ref { get; set; }
     public DateTime add_date { get; set; }
     public int sync_status { get; set; }
 }

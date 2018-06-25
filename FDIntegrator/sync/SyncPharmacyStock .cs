@@ -47,9 +47,9 @@ namespace FDIntegrator.sync
                     }
                     dr.Close();
                 }
-                catch (SqlException me)
+                catch (Exception e)
                 {
-                    //
+                    Console.WriteLine(e.StackTrace);
                 }
 
                 loop = loop + 1;
@@ -69,7 +69,7 @@ namespace FDIntegrator.sync
             }
             try
             {
-                PharmacyStock.facility_code = Convert.ToString(dr["facility_code"]);
+                PharmacyStock.facility_code = Convert.ToString(dr["intf_facility_code"]);
             }
             catch (InvalidCastException ice)
             {
@@ -77,7 +77,7 @@ namespace FDIntegrator.sync
             }
             try
             {
-                PharmacyStock.product_code = Convert.ToString(dr["product_code"]);
+                PharmacyStock.product_code = Convert.ToString(dr["intf_product_code"]);
             }
             catch (InvalidCastException ice)
             {
@@ -85,7 +85,7 @@ namespace FDIntegrator.sync
             }
             try
             {
-                PharmacyStock.unit_code = Convert.ToString(dr["unit_code"]);
+                PharmacyStock.unit_code = Convert.ToString(dr["intf_unit_code"]);
             }
             catch (InvalidCastException ice)
             {
@@ -175,6 +175,7 @@ namespace FDIntegrator.sync
             }
             catch (Exception e)
             {
+                Console.WriteLine(e.StackTrace);
                 status = 0;
             }
             return status;

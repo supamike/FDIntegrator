@@ -47,9 +47,9 @@ namespace FDIntegrator.sync
                     }
                     dr.Close();
                 }
-                catch (SqlException me)
+                catch (SqlException e)
                 {
-                    //
+                    Console.WriteLine(e.StackTrace);
                 }
 
                 loop = loop + 1;
@@ -109,6 +109,7 @@ namespace FDIntegrator.sync
                 cmd.Connection.Close();
             }catch(Exception e)
             {
+                Console.WriteLine(e.StackTrace);
                 status = 0;
             }
             return status;

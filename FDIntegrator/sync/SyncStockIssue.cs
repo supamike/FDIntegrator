@@ -25,7 +25,7 @@ namespace FDIntegrator.sync
             stock_issue StockIssue = null;
             while (loop <= Loops)
             {
-                String sql_from = "SELECT * FROM intf_stock_isue WHERE sync_status=0";
+                String sql_from = "SELECT * FROM intf_stock_issue WHERE sync_status=0";
                 try
                 {
                     SqlConnection conn = new SqlConnection(DatabaseConnection.getLocalConnectionString());
@@ -47,9 +47,9 @@ namespace FDIntegrator.sync
                     }
                     dr.Close();
                 }
-                catch (SqlException me)
+                catch (Exception e)
                 {
-                    //
+                    Console.WriteLine(e.StackTrace);
                 }
 
                 loop = loop + 1;
@@ -69,7 +69,7 @@ namespace FDIntegrator.sync
             }
             try
             {
-                StockIssue.facility_code = Convert.ToString(dr["facility_code"]);
+                StockIssue.facility_code = Convert.ToString(dr["intf_facility_code"]);
             }
             catch (InvalidCastException ice)
             {
@@ -77,7 +77,7 @@ namespace FDIntegrator.sync
             }
             try
             {
-                StockIssue.product_code = Convert.ToString(dr["product_code"]);
+                StockIssue.product_code = Convert.ToString(dr["intf_product_code"]);
             }
             catch (InvalidCastException ice)
             {
@@ -85,7 +85,7 @@ namespace FDIntegrator.sync
             }
             try
             {
-                StockIssue.unit_code = Convert.ToString(dr["unit_code"]);
+                StockIssue.unit_code = Convert.ToString(dr["intf_unit_code"]);
             }
             catch (InvalidCastException ice)
             {
@@ -106,6 +106,14 @@ namespace FDIntegrator.sync
             catch (InvalidCastException ice)
             {
                 StockIssue.batch_number = "";
+            }
+            try
+            {
+                StockIssue.issue_number = Convert.ToString(dr["issue_number"]);
+            }
+            catch (InvalidCastException ice)
+            {
+                StockIssue.issue_number = "";
             }
             try
             {
@@ -189,6 +197,7 @@ namespace FDIntegrator.sync
                                 StockIssue.unit_code + "','" +
                                 StockIssue.batch_number + "'," +
                                 StockIssue.quantity + "," +
+                                StockIssue.issue_number + "'," +
                                 StockIssue.requisition_number + "'," +
                                 "'" + string.Format("{0:yyyy-MM-dd HH:mm}", DateTime.Now) + "'," +
                                 0 + "," +
@@ -203,6 +212,7 @@ namespace FDIntegrator.sync
                 cmd.Connection.Close();
             }catch(Exception e)
             {
+                Console.WriteLine(e.StackTrace);
                 status = 0;
             }
             return status;

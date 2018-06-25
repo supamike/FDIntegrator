@@ -35,7 +35,8 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>3</WarningLevel>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -47,6 +48,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup />
+  <PropertyGroup>
+    <StartupObject>FDIntegrator.TestMain</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
@@ -65,6 +69,7 @@
   <ItemGroup>
     <Compile Include="config\DatabaseConnection.cs" />
     <Compile Include="entity\facility_config.cs" />
+    <Compile Include="entity\conn_status.cs" />
     <Compile Include="entity\goods_received.cs" />
     <Compile Include="entity\facility_order.cs" />
     <Compile Include="entity\patient_visit.cs" />
@@ -100,14 +105,17 @@
     <Compile Include="sync\SyncPatientVisit.cs" />
     <Compile Include="sync\SyncStockDispensed.cs" />
     <Compile Include="sync\SyncStockDisposed.cs" />
+    <Compile Include="sync\SyncStockReturn.cs" />
     <Compile Include="sync\SyncStockRequisition.cs" />
     <Compile Include="sync\SyncStockIssue.cs" />
     <Compile Include="sync\SyncStockAdjustment.cs" />
     <Compile Include="sync\SyncPharmacyStock .cs" />
     <Compile Include="sync\SyncGoodsReceived .cs" />
     <Compile Include="sync\SyncFacilityOrder .cs" />
+    <Compile Include="sync\SyncConnStatus.cs" />
     <Compile Include="sync\SyncStoreStock.cs" />
     <Compile Include="sync\Sync.cs" />
+    <Compile Include="TestMain.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

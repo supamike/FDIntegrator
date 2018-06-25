@@ -11,21 +11,21 @@ using FDIntegrator.entity;
 
 namespace FDIntegrator.sync
 {
-    class SyncStoreStock
+    class SyncStockReturn
     {
         public String Sync()
         {
             int Loops = 1;
             int loop = 1;
-            double TotalRecords= new Sync().NewRecordsCount("intf_store_stock");
+            double TotalRecords= new Sync().NewRecordsCount("intf_stock_return");
             double RecordsBatchFactor = TotalRecords/DatabaseConnection.SYNC_BATCH_SIZE;
             Loops = (Int32)Math.Ceiling(RecordsBatchFactor);
             int i = 0;
             int SyncPass = 0;
-            store_stock StoreStock = null;
+            stock_return StockReturn = null;
             while (loop <= Loops)
             {
-                String sql_from = "SELECT * FROM intf_store_stock WHERE sync_status=0";
+                String sql_from = "SELECT * FROM intf_stock_return WHERE sync_status=0";
                 try
                 {
                     SqlConnection conn = new SqlConnection(DatabaseConnection.getLocalConnectionString());
@@ -34,15 +34,15 @@ namespace FDIntegrator.sync
                     SqlDataReader dr = cmd.ExecuteReader(CommandBehavior.CloseConnection);
                     while (dr.Read())
                     {
-                        StoreStock = new store_stock();
-                        this.SetStoreStock(StoreStock, dr);
-                        if (this.InsertStoreStock(StoreStock) == 1)
+                        StockReturn = new stock_return();
+                        this.SetStockReturn(StockReturn, dr);
+                        if (this.InsertStockReturn(StockReturn) == 1)
                         {
                             //update sync status
                             SyncPass = SyncPass + 1;
-                            new Sync().UpdateLocalSyncStatus("intf_store_stock", "intf_store_stock_id", 1, StoreStock.intf_store_stock_id);
+                            new Sync().UpdateLocalSyncStatus("intf_store_stock", "intf_stock_return_id", 1, StockReturn.intf_stock_return_id);
                         }
-                        StoreStock = null;
+                        StockReturn = null;
                         i = i + 1;
                     }
                     dr.Close();
@@ -57,96 +57,122 @@ namespace FDIntegrator.sync
             return SyncPass + "/" + TotalRecords + " Synced" + " Loops:" + Loops;
         }
 
-        public void SetStoreStock (store_stock StoreStock,SqlDataReader dr)
+        public void SetStockReturn (stock_return StockReturn,SqlDataReader dr)
         {
             try
             {
-                StoreStock.intf_store_stock_id = Convert.ToInt64(dr["intf_store_stock_id"]);
+                StockReturn.intf_stock_return_id = Convert.ToInt64(dr["intf_stock_return_id"]);
             }
             catch (InvalidCastException ice)
             {
-                StoreStock.intf_store_stock_id = 0;
+                StockReturn.intf_stock_return_id = 0;
             }
             try
             {
-                StoreStock.facility_code = Convert.ToString(dr["intf_facility_code"]);
+                StockReturn.facility_code = Convert.ToString(dr["intf_facility_code"]);
             }
             catch (InvalidCastException ice)
             {
-                StoreStock.facility_code = "";
+                StockReturn.facility_code = "";
             }
             try
             {
-                StoreStock.product_code = Convert.ToString(dr["intf_product_code"]);
+                StockReturn.product_code = Convert.ToString(dr["intf_product_code"]);
             }
             catch (InvalidCastException ice)
             {
-                StoreStock.product_code = "";
+                StockReturn.product_code = "";
             }
             try
             {
-                StoreStock.unit_code = Convert.ToString(dr["intf_unit_code"]);
+                StockReturn.unit_code = Convert.ToString(dr["intf_unit_code"]);
             }
             catch (InvalidCastException ice)
             {
-                StoreStock.unit_code = "";
+                StockReturn.unit_code = "";
             }
             try
             {
-                StoreStock.batch_number = Convert.ToString(dr["batch_number"]);
+                StockReturn.return_number = Convert.ToString(dr["return_number"]);
             }
             catch (InvalidCastException ice)
             {
-                StoreStock.batch_number = "";
+                StockReturn.return_number = "";
             }
             try
             {
-                StoreStock.cdc_date = Convert.ToDateTime(dr["cdc_date"]);
+                StockReturn.batch_number = Convert.ToString(dr["batch_number"]);
             }
             catch (InvalidCastException ice)
             {
-                StoreStock.cdc_date = Convert.ToDateTime(null);
+                StockReturn.batch_number = "";
             }
             try
             {
-                StoreStock.quantity = Convert.ToSingle(dr["quantity"]);
+                StockReturn.return_number = Convert.ToString(dr["return_number"]);
             }
             catch (InvalidCastException ice)
             {
-                StoreStock.quantity = 0;
+                StockReturn.return_number = "";
             }
             try
             {
-                StoreStock.manufacture_date = Convert.ToDateTime(dr["manufacture_date"]);
+                StockReturn.return_date = Convert.ToDateTime(dr["return_date"]);
             }
             catch (InvalidCastException ice)
             {
-                StoreStock.manufacture_date = Convert.ToDateTime(null);
+                StockReturn.return_date = Convert.ToDateTime(null);
             }
             try
             {
-                StoreStock.expiry_date = Convert.ToDateTime(dr["expiry_date"]);
+                StockReturn.cdc_date = Convert.ToDateTime(dr["cdc_date"]);
             }
             catch (InvalidCastException ice)
             {
-                StoreStock.expiry_date = Convert.ToDateTime(null);
+                StockReturn.cdc_date = Convert.ToDateTime(null);
+            }
+            try
+            {
+                StockReturn.quantity = Convert.ToSingle(dr["quantity"]);
+            }
+            catch (InvalidCastException ice)
+            {
+                StockReturn.quantity = 0;
+            }
+            try
+            {
+                StockReturn.manufacture_date = Convert.ToDateTime(dr["manufacture_date"]);
+            }
+            catch (InvalidCastException ice)
+            {
+                StockReturn.manufacture_date = Convert.ToDateTime(null);
+            }
+            try
+            {
+                StockReturn.expiry_date = Convert.ToDateTime(dr["expiry_date"]);
+            }
+            catch (InvalidCastException ice)
+            {
+                StockReturn.expiry_date = Convert.ToDateTime(null);
             }
         }
 
-        public int InsertStoreStock(store_stock StoreStock)
+        public int InsertStockReturn(stock_return StockReturn)
         {
             int status = 0;
             try
             {
-                String sql_to = "INSERT INTO intf_store_stock" +
+                String sql_to = "INSERT INTO intf_stock_return" +
                                 "(" +
-                                "intf_store_stock_id," +
+                                "intf_stock_return_id," +
                                 "cdc_date," +
+                                "return_date," +
                                 "intf_product_code," +
                                 "intf_facility_code," +
                                 "intf_unit_code," +
                                 "batch_number," +
                                 "quantity," +
+                                "return_number," +
                                 "add_date," +
                                 "load_status," +
                                 "manufacture_date," +
@@ -154,17 +180,19 @@ namespace FDIntegrator.sync
                                 ") " +
                                 " VALUES" +
                                 "(" +
-                                StoreStock.intf_store_stock_id + "," +
-                                "'" + string.Format("{0:yyyy-MM-dd HH:mm}", StoreStock.cdc_date) + "','" +
-                                StoreStock.product_code + "','" +
-                                StoreStock.facility_code + "','" +
-                                StoreStock.unit_code + "','" +
-                                StoreStock.batch_number + "'," +
-                                StoreStock.quantity + "," +
+                                StockReturn.intf_stock_return_id + "," +
+                                "'" + string.Format("{0:yyyy-MM-dd HH:mm}", StockReturn.cdc_date) + "','" +
+                                "'" + string.Format("{0:yyyy-MM-dd HH:mm}", StockReturn.return_date) + "','" +
+                                StockReturn.product_code + "','" +
+                                StockReturn.facility_code + "','" +
+                                StockReturn.unit_code + "','" +
+                                StockReturn.batch_number + "'," +
+                                StockReturn.quantity + "," +
+                                StockReturn.return_number + "'," +
                                 "'" + string.Format("{0:yyyy-MM-dd HH:mm}", DateTime.Now) + "'," +
                                 0 + "," +
-                                "'" + string.Format("{0:yyyy-MM-dd HH:mm}", StoreStock.manufacture_date) + "'," +
-                                "'" + string.Format("{0:yyyy-MM-dd HH:mm}", StoreStock.expiry_date) + "'" +
+                                "'" + string.Format("{0:yyyy-MM-dd HH:mm}", StockReturn.manufacture_date) + "'," +
+                                "'" + string.Format("{0:yyyy-MM-dd HH:mm}", StockReturn.expiry_date) + "'" +
                                 ") ";
                 SqlConnection conn = new SqlConnection(DatabaseConnection.getRemoteConnectionString());
                 SqlCommand cmd = new SqlCommand(sql_to, conn);
